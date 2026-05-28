@@ -30,13 +30,9 @@ class UserAccountService:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
                 )
-            
+
             contact = next(
-                (
-                    contact
-                    for contact in user.contacts
-                    if contact.deleted_at is None
-                ),
+                (contact for contact in user.contacts if contact.deleted_at is None),
                 None,
             )
 
@@ -176,8 +172,9 @@ class UserAccountService:
                 detail="An unexpected error has occurred",
             )
 
-    
-    async def add_contact(self, user_id: str, request_body: UserContactAdd, db: Session) -> JSONResponse:
+    async def add_contact(
+        self, user_id: str, request_body: UserContactAdd, db: Session
+    ) -> JSONResponse:
         try:
             contact = (
                 db.query(UserContact)
@@ -197,7 +194,7 @@ class UserAccountService:
                 user_id=user_id,
                 dial_code=request_body.dial_code,
                 mobile_number=request_body.mobile_number,
-                is_mobile_number_verified=True
+                is_mobile_number_verified=True,
             )
 
             db.add(contact)
@@ -221,7 +218,7 @@ class UserAccountService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="An unexpected error occurred",
             )
-        
+
     async def delete_contact(self, user_id: str, db: Session) -> JSONResponse:
         try:
             contact = (
@@ -237,16 +234,14 @@ class UserAccountService:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="No contact found"
                 )
-            
+
             contact.deleted_at = datetime.now(timezone.utc)
-            
+
             db.commit()
 
             return JSONResponse(
                 status_code=status.HTTP_200_OK,
-                content={
-                    "status": "success"
-                },
+                content={"status": "success"},
             )
 
         except HTTPException:

@@ -46,6 +46,7 @@ class User(USERS_DB_BASE):
         cascade="all, delete-orphan",
     )
 
+
 class UserContact(USERS_DB_BASE):
     __tablename__ = "user_contacts"
     __table_args__ = {"extend_existing": True}
