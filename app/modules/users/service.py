@@ -197,7 +197,7 @@ class UserAccountService:
                 user_id=user_id,
                 dial_code=request_body.dial_code,
                 mobile_number=request_body.mobile_number,
-                is_mobile_number_verified=request_body.is_mobile_number_verified
+                is_mobile_number_verified=True
             )
 
             db.add(contact)

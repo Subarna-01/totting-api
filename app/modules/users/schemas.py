@@ -25,8 +25,7 @@ class UserLogin(BaseModel):
 class UserContactAdd(BaseModel):
     dial_code: constr(strip_whitespace=True, min_length=2, max_length=4) # type: ignore
     mobile_number: constr(strip_whitespace=True, max_length=14) # type: ignore
-    is_mobile_number_verified: bool = False
-
+ 
     @field_validator("dial_code")
     @classmethod
     def validate_dial_code(cls, value: str) -> str:
