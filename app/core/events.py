@@ -20,8 +20,8 @@ async def startup():
         engine = db_conn.get_engine(db_name)
         Base.metadata.create_all(bind=engine)
 
-    await redis_conn.connect()
-    await arq_conn.get_client()
+    # await redis_conn.connect()
+    # await arq_conn.get_client()
 
     e = time.time()
     logger.info(f"Resources preparation complete in {e - s:.2f}s.")
@@ -32,8 +32,8 @@ async def shutdown():
     logger.info("Cleaning up resources...")
 
     await db_conn.close()
-    await redis_conn.close()
-    await arq_conn.close()
+    # await redis_conn.close()
+    # await arq_conn.close()
 
     e = time.time()
     logger.info(f"Resources cleanup complete in {e - s:.2f}s.")
