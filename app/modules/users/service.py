@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from app.core.jwt import create_access_token, create_refresh_token
 from app.core.security import hash_password, verify_password
-from app.models.users.models import User, UserContact
+from app.models.users.models import User
 from app.modules.users.enum import UserStatus
-from app.modules.users.schemas import UserCreate, UserLogin, UserContactAdd
+from app.modules.users.schemas import UserCreate, UserLogin
 
 
 class UserAccountService:
@@ -19,9 +19,8 @@ class UserAccountService:
             user = (
                 db.query(User)
                 .filter(
-                    cast(User.user_id, String) == user_id,
+                    cast(User._id, String) == user_id,
                     User.status == UserStatus.ACTIVE.value,
-                    User.deleted_at.is_(None),
                 )
                 .first()
             )
@@ -41,7 +40,7 @@ class UserAccountService:
                 content={
                     "status": "success",
                     "data": {
-                        "user_id": str(user.user_id),
+                        "user_id": str(user._id),
                         "email": user.email,
                         "is_email_verified": user.is_email_verified,
                         "is_organizer": user.is_organizer,
@@ -99,7 +98,7 @@ class UserAccountService:
                 status_code=status.HTTP_201_CREATED,
                 content={
                     "status": "success",
-                    "data": {"user_id": str(user.user_id)},
+                    "data": {"user_id": str(user._id)},
                 },
             )
 
@@ -143,7 +142,7 @@ class UserAccountService:
             db.commit()
 
             token_payload = {
-                "user_id": str(user.user_id),
+                "user_id": str(user._id),
                 "email": user.email,
             }
 
@@ -170,86 +169,4 @@ class UserAccountService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="An unexpected error has occurred",
-            )
-
-    async def add_contact(
-        self, user_id: str, request_body: UserContactAdd, db: Session
-    ) -> JSONResponse:
-        try:
-            contact = (
-                db.query(UserContact)
-                .filter(
-                    cast(UserContact.user_id, String) == user_id,
-                    UserContact.deleted_at.is_(None),
-                )
-                .first()
-            )
-
-            if contact:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT, detail="Contact already added"
-                )
-
-            contact = UserContact(
-                user_id=user_id,
-                dial_code=request_body.dial_code,
-                mobile_number=request_body.mobile_number,
-                is_mobile_number_verified=True,
-            )
-
-            db.add(contact)
-            db.commit()
-            db.refresh(contact)
-
-            return JSONResponse(
-                status_code=status.HTTP_201_CREATED,
-                content={
-                    "status": "success",
-                    "data": {"_id": str(contact._id)},
-                },
-            )
-
-        except HTTPException:
-            raise
-
-        except Exception as e:
-            db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An unexpected error occurred",
-            )
-
-    async def delete_contact(self, user_id: str, db: Session) -> JSONResponse:
-        try:
-            contact = (
-                db.query(UserContact)
-                .filter(
-                    cast(UserContact.user_id, String) == user_id,
-                    UserContact.deleted_at.is_(None),
-                )
-                .first()
-            )
-
-            if not contact:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="No contact found"
-                )
-
-            contact.deleted_at = datetime.now(timezone.utc)
-
-            db.commit()
-
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"status": "success"},
-            )
-
-        except HTTPException:
-            raise
-
-        except Exception as e:
-            db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An unexpected error occurred",
             )

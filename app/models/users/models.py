@@ -17,8 +17,8 @@ class User(USERS_DB_BASE):
     __tablename__ = "users"
     __table_args__ = {"extend_existing": True}
 
-    user_id = Column(
-        "user_id",
+    _id = Column(
+        "_id",
         UUID(as_uuid=True),
         primary_key=True,
         server_default=text("gen_random_uuid()"),
@@ -55,7 +55,7 @@ class UserContact(USERS_DB_BASE):
     user_id = Column(
         "user_id",
         UUID(as_uuid=True),
-        ForeignKey("users.user_id", ondelete="CASCADE"),
+        ForeignKey("users._id", ondelete="CASCADE"),
         nullable=False,
     )
     dial_code = Column("dial_code", String(4), nullable=False)

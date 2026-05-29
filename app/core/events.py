@@ -1,13 +1,13 @@
 import time
 from app.core.arq.connection import connection as arq_conn
-from app.core.database.base import USERS_DB_BASE
+from app.core.database.base import USERS_DB_BASE, GAMES_DB_BASE
 from app.core.database.connection import connection as db_conn
 from app.core.redis.connection import connection as redis_conn
 from app.core.logging import logger
 from app.core.settings import settings
 
-DB_NAMES = [settings.USERS_DB]
-DB_BASES = [USERS_DB_BASE]
+DB_NAMES = [settings.USERS_DB, settings.GAMES_DB]
+DB_BASES = [USERS_DB_BASE, GAMES_DB_BASE]
 
 
 async def startup():

@@ -5,7 +5,7 @@ from functools import partial
 from app.core.database.dependencies import get_db
 from app.core.jwt import authenticate
 from app.core.settings import settings
-from app.modules.users.schemas import UserCreate, UserLogin, UserContactAdd
+from app.modules.users.schemas import UserCreate, UserLogin
 from app.modules.users.service import UserAccountService
 
 router = APIRouter(prefix="/users")
@@ -35,22 +35,3 @@ async def login(
     db: Session = Depends(partial(get_db, settings.USERS_DB)),
 ) -> JSONResponse:
     return await user_account_service.login(request_body, db)
-
-
-@router.post("/accounts/contact/add")
-async def add_contact(
-    request_body: UserContactAdd,
-    payload: dict = Depends(authenticate()),
-    db: Session = Depends(partial(get_db, settings.USERS_DB)),
-) -> JSONResponse:
-    return await user_account_service.add_contact(
-        payload.get("user_id"), request_body, db
-    )
-
-
-@router.delete("/accounts/contact/delete")
-async def delete_contact(
-    payload: dict = Depends(authenticate()),
-    db: Session = Depends(partial(get_db, settings.USERS_DB)),
-) -> JSONResponse:
-    return await user_account_service.delete_contact(payload.get("user_id"), db)

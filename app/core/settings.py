@@ -16,6 +16,7 @@ class Settings:
     DB_CONNECTION_TIMEOUT: int = int(os.getenv("DB_CONNECTION_TIMEOUT"))
 
     USERS_DB: str = os.getenv("USERS_DB")
+    GAMES_DB: str = os.getenv("GAMES_DB")
 
     REDIS_HOST: str = os.getenv("REDIS_HOST")
     REDIS_PORT: int = int(os.getenv("REDIS_PORT"))

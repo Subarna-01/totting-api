@@ -1,4 +1,3 @@
-import uuid
 import jwt
 import datetime
 from fastapi import Depends, HTTPException, status
@@ -35,21 +34,6 @@ def create_refresh_token(
     )
 
 
-def create_email_verification_token(
-    payload: dict, expires_delta: int = settings.EMAIL_VERIFICATION_TOKEN_EXPIRE_MINUTES
-) -> str:
-    jti = str(uuid.uuid4())
-    to_encode = payload.copy()
-    to_encode.update({"jti": jti})
-    expire = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
-        minutes=expires_delta
-    )
-    to_encode.update({"exp": expire})
-    return jwt.encode(
-        to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
-    )
-
-
 def decode_token(token: str) -> dict | None:
     try:
         payload = jwt.decode(
@@ -77,7 +61,7 @@ def authenticate(required_roles: Optional[List[str]] = None):
             if not any(role in roles for role in required_roles):
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="You do not have the required role to perform this operation",
+                    detail="You do not have the required role to access this endpoint",
                 )
 
         return payload

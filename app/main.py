@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from app.core.events import startup, shutdown
 from app.core.settings import settings
 from app.modules.users.router import router as users_router
+from app.modules.games.router import router as games_router
 
 
 @asynccontextmanager
@@ -40,3 +41,4 @@ async def health():
 
 
 app.include_router(users_router, prefix=settings.API_V1_STR)
+app.include_router(games_router, prefix=settings.API_V1_STR)
